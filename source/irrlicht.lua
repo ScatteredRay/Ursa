@@ -1,45 +1,59 @@
 project("irrlicht")
     kind("StaticLib")
-    files { "../include/**.h", "Irrlicht/**.h", "Irrlicht/**.cpp" }
-    includedirs { "../include", "Irrlicht/zlib", "Irrlicht/jpeglib", "Irrlicht/libpng" }
+    files { "Irrlich/inc/**.h", "Irrlicht/src/**.h", "Irrlicht/src/**.cpp" }
+    includedirs { "Irrlicht/inc", "Irrlicht/src/zlib", "Irrlicht/src/jpeglib", "Irrlicht/src/libpng" }
     defines { "IRRLICHT_EXPORTS=1" }
 
     -- For zlib, jpeglib, and libpng
-    files { "Irrlicht/zlib/adler32.c", "Irrlicht/zlib/compress.c", "Irrlicht/zlib/crc32.c",
-            "Irrlicht/zlib/deflate.c", "Irrlicht/zlib/inffast.c", "Irrlicht/zlib/inflate.c",
-            "Irrlicht/zlib/inftrees.c", "Irrlicht/zlib/trees.c", "Irrlicht/zlib/uncompr.c",
-            "Irrlicht/zlib/zutil.c", "Irrlicht/libpng/png.c", "Irrlicht/libpng/pngerror.c",
-            "Irrlicht/libpng/pngget.c", "Irrlicht/libpng/pngmem.c", "Irrlicht/libpng/pngpread.c",
-            "Irrlicht/libpng/pngread.c", "Irrlicht/libpng/pngrio.c", "Irrlicht/libpng/pngrtran.c",
-            "Irrlicht/libpng/pngrutil.c", "Irrlicht/libpng/pngset.c", "Irrlicht/libpng/pngtrans.c",
-            "Irrlicht/libpng/pngwio.c", "Irrlicht/libpng/pngwrite.c", "Irrlicht/libpng/pngwtran.c",
-            "Irrlicht/libpng/pngwutil.c", "Irrlicht/jpeglib/jcapimin.c", "Irrlicht/jpeglib/jcapistd.c",
-            "Irrlicht/jpeglib/jccoefct.c", "Irrlicht/jpeglib/jccolor.c", "Irrlicht/jpeglib/jcdctmgr.c",
-            "Irrlicht/jpeglib/jchuff.c", "Irrlicht/jpeglib/jcinit.c", "Irrlicht/jpeglib/jcmainct.c",
-            "Irrlicht/jpeglib/jcmarker.c", "Irrlicht/jpeglib/jcmaster.c", "Irrlicht/jpeglib/jcomapi.c",
-            "Irrlicht/jpeglib/jcparam.c", "Irrlicht/jpeglib/jcprepct.c", "Irrlicht/jpeglib/jcsample.c",
-            "Irrlicht/jpeglib/jctrans.c", "Irrlicht/jpeglib/jdapimin.c", "Irrlicht/jpeglib/jdapistd.c",
-            "Irrlicht/jpeglib/jdatadst.c", "Irrlicht/jpeglib/jdatasrc.c", "Irrlicht/jpeglib/jdcoefct.c",
-            "Irrlicht/jpeglib/jdcolor.c", "Irrlicht/jpeglib/jddctmgr.c", "Irrlicht/jpeglib/jdhuff.c",
-            "Irrlicht/jpeglib/jdinput.c", "Irrlicht/jpeglib/jdmainct.c", "Irrlicht/jpeglib/jdmarker.c",
-            "Irrlicht/jpeglib/jdmaster.c", "Irrlicht/jpeglib/jdmerge.c", "Irrlicht/jpeglib/jdpostct.c",
-            "Irrlicht/jpeglib/jdsample.c", "Irrlicht/jpeglib/jdtrans.c", "Irrlicht/jpeglib/jerror.c",
-            "Irrlicht/jpeglib/jfdctflt.c", "Irrlicht/jpeglib/jfdctfst.c", "Irrlicht/jpeglib/jfdctint.c",
-            "Irrlicht/jpeglib/jidctflt.c", "Irrlicht/jpeglib/jidctfst.c", "Irrlicht/jpeglib/jidctint.c",
-            "Irrlicht/jpeglib/jmemmgr.c", "Irrlicht/jpeglib/jmemnobs.c", "Irrlicht/jpeglib/jquant1.c",
-            "Irrlicht/jpeglib/jquant2.c", "Irrlicht/jpeglib/jutils.c", "Irrlicht/jpeglib/jcarith.c",
-            "Irrlicht/jpeglib/jdarith.c", "Irrlicht/jpeglib/jaricom.c", "Irrlicht/aesGladman/aescrypt.cpp",
-            "Irrlicht/aesGladman/aeskey.cpp", "Irrlicht/aesGladman/aestab.cpp", "Irrlicht/aesGladman/fileenc.cpp",
-            "Irrlicht/aesGladman/hmac.cpp", "Irrlicht/aesGladman/prng.cpp", "Irrlicht/aesGladman/pwd2key.cpp",
-            "Irrlicht/aesGladman/sha1.cpp", "Irrlicht/aesGladman/sha2.cpp", "Irrlicht/bzip2/blocksort.c",
-            "Irrlicht/bzip2/huffman.c", "Irrlicht/bzip2/crctable.c", "Irrlicht/bzip2/randtable.c",
-            "Irrlicht/bzip2/bzcompress.c", "Irrlicht/bzip2/decompress.c", "Irrlicht/bzip2/bzlib.c",
-            "Irrlicht/lzma/LzmaDec.c"}
+    files { "Irrlicht/src/zlib/adler32.c", "Irrlicht/src/zlib/compress.c",
+            "Irrlicht/src/zlib/crc32.c", "Irrlicht/src/zlib/deflate.c",
+            "Irrlicht/src/zlib/inffast.c", "Irrlicht/src/zlib/inflate.c",
+            "Irrlicht/src/zlib/inftrees.c", "Irrlicht/src/zlib/trees.c",
+            "Irrlicht/src/zlib/uncompr.c", "Irrlicht/src/zlib/zutil.c",
+            "Irrlicht/src/libpng/png.c", "Irrlicht/src/libpng/pngerror.c",
+            "Irrlicht/src/libpng/pngget.c", "Irrlicht/src/libpng/pngmem.c",
+            "Irrlicht/src/libpng/pngpread.c", "Irrlicht/src/libpng/pngread.c",
+            "Irrlicht/src/libpng/pngrio.c", "Irrlicht/src/libpng/pngrtran.c",
+            "Irrlicht/src/libpng/pngrutil.c", "Irrlicht/src/libpng/pngset.c",
+            "Irrlicht/src/libpng/pngtrans.c", "Irrlicht/src/libpng/pngwio.c",
+            "Irrlicht/src/libpng/pngwrite.c", "Irrlicht/src/libpng/pngwtran.c",
+            "Irrlicht/src/libpng/pngwutil.c", "Irrlicht/src/jpeglib/jcapimin.c",
+            "Irrlicht/src/jpeglib/jcapistd.c", "Irrlicht/src/jpeglib/jccoefct.c",
+            "Irrlicht/src/jpeglib/jccolor.c", "Irrlicht/src/jpeglib/jcdctmgr.c",
+            "Irrlicht/src/jpeglib/jchuff.c", "Irrlicht/src/jpeglib/jcinit.c",
+            "Irrlicht/src/jpeglib/jcmainct.c", "Irrlicht/src/jpeglib/jcmarker.c",
+            "Irrlicht/src/jpeglib/jcmaster.c", "Irrlicht/src/jpeglib/jcomapi.c",
+            "Irrlicht/src/jpeglib/jcparam.c", "Irrlicht/src/jpeglib/jcprepct.c",
+            "Irrlicht/src/jpeglib/jcsample.c", "Irrlicht/src/jpeglib/jctrans.c",
+            "Irrlicht/src/jpeglib/jdapimin.c", "Irrlicht/src/jpeglib/jdapistd.c",
+            "Irrlicht/src/jpeglib/jdatadst.c", "Irrlicht/src/jpeglib/jdatasrc.c",
+            "Irrlicht/src/jpeglib/jdcoefct.c", "Irrlicht/src/jpeglib/jdcolor.c",
+            "Irrlicht/src/jpeglib/jddctmgr.c", "Irrlicht/src/jpeglib/jdhuff.c",
+            "Irrlicht/src/jpeglib/jdinput.c", "Irrlicht/src/jpeglib/jdmainct.c",
+            "Irrlicht/src/jpeglib/jdmarker.c", "Irrlicht/src/jpeglib/jdmaster.c",
+            "Irrlicht/src/jpeglib/jdmerge.c", "Irrlicht/src/jpeglib/jdpostct.c",
+            "Irrlicht/src/jpeglib/jdsample.c", "Irrlicht/src/jpeglib/jdtrans.c",
+            "Irrlicht/src/jpeglib/jerror.c", "Irrlicht/src/jpeglib/jfdctflt.c",
+            "Irrlicht/src/jpeglib/jfdctfst.c", "Irrlicht/src/jpeglib/jfdctint.c",
+            "Irrlicht/src/jpeglib/jidctflt.c", "Irrlicht/src/jpeglib/jidctfst.c",
+            "Irrlicht/src/jpeglib/jidctint.c", "Irrlicht/src/jpeglib/jmemmgr.c",
+            "Irrlicht/src/jpeglib/jmemnobs.c", "Irrlicht/src/jpeglib/jquant1.c",
+            "Irrlicht/src/jpeglib/jquant2.c", "Irrlicht/src/jpeglib/jutils.c",
+            "Irrlicht/src/jpeglib/jcarith.c", "Irrlicht/src/jpeglib/jdarith.c",
+            "Irrlicht/src/jpeglib/jaricom.c", "Irrlicht/src/aesGladman/aescrypt.cpp",
+            "Irrlicht/src/aesGladman/aeskey.cpp", "Irrlicht/src/aesGladman/aestab.cpp",
+            "Irrlicht/src/aesGladman/fileenc.cpp", "Irrlicht/src/aesGladman/hmac.cpp",
+            "Irrlicht/src/aesGladman/prng.cpp", "Irrlicht/src/aesGladman/pwd2key.cpp",
+            "Irrlicht/src/aesGladman/sha1.cpp", "Irrlicht/src/aesGladman/sha2.cpp",
+            "Irrlicht/src/bzip2/blocksort.c", "Irrlicht/src/bzip2/huffman.c",
+            "Irrlicht/src/bzip2/crctable.c", "Irrlicht/src/bzip2/randtable.c",
+            "Irrlicht/src/bzip2/bzcompress.c", "Irrlicht/src/bzip2/decompress.c",
+            "Irrlicht/src/bzip2/bzlib.c", "Irrlicht/src/lzma/LzmaDec.c"}
     defines { "PNG_THREAD_UNSAFE_OK", "PNG_NO_MMX_CODE", "PNG_NO_MNG_FEATURES" }
 
     -- Mac OSX
-    files { "Irrlicht/MacOSX/**.mm" }
-    includedirs { "Irrlicht/MacOSX" }
+    files { "Irrlicht/src/MacOSX/**.mm" }
+    includedirs { "Irrlicht/src/MacOSX" }
 
     configuration("Debug")
         defines { "_DEBUG" }
