@@ -5,4 +5,5 @@ targetdir("../bin")
 language("C++")
 
 require "irrlicht"
+require "lua"
 require "crowgame"
