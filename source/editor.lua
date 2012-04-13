@@ -1,6 +1,6 @@
-project("crowgame")
+project("editor")
     kind("WindowedApp")
-    files { "CrowGame/src/**.h", "CrowGame/src/**.cpp" }
+    files { "Editor/src/**.h", "Editor/src/**.cpp" }
     includedirs { "Irrlicht/inc", "lua/inc" }
     links { "irrlicht", "lua", "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }
 

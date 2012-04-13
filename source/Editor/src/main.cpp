@@ -9,7 +9,7 @@ int main()
 	if (!device)
 		return 1;
 
-	device->setWindowCaption(L"CrowGame");
+	device->setWindowCaption(L"UrEd");
 
     irr::video::IVideoDriver* driver = device->getVideoDriver();
     irr::scene::ISceneManager* smgr = device->getSceneManager();

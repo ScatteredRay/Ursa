@@ -6,4 +6,4 @@ language("C++")
 
 require "irrlicht"
 require "lua"
-require "crowgame"
+require "editor"
