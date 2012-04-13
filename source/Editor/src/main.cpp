@@ -4,6 +4,14 @@
 
 #include <vector>
 
+#ifdef __APPLE__
+#include "strings.h"
+int stricmp(const char* l, const char* r)
+{
+    return strcasecmp(l, r);
+}
+#endif
+
 #define UDebugF printf
 
 // Debug or non-shipping release builds.
@@ -86,7 +94,7 @@ public:
             {
                 UDebugF("Resource (%s:%s:%s) found already loaded with mismatching case (%s:%s:%s)",
                         group, name, type,
-                        (*it).group, (*it).name, (*it).type);
+                        (*it)->group, (*it)->name, (*it)->type);
 
                 return getDefaultResource(type);
             }
