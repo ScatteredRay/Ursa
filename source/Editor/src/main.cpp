@@ -1,4 +1,111 @@
 #include <irrlicht.h>
+#include <lua.h>
+#include <lauxlib.h>
+
+#include <vector>
+
+#define UDebugF printf
+
+// Debug or non-shipping release builds.
+#define VERIFY 1
+
+char* string_new(const char* str)
+{
+    char* newstr = new char[strlen(str) + 1];
+    strcpy(newstr, str);
+}
+
+char* find_resource_location(const char* group, const char* name, const char* type)
+{
+    const char* project = "editor";
+    //TODO: Build this helper func!
+    size_t len = strlen(project) + strlen(group) + strlen(name) + strlen(type) + 11 + 1;
+    char* path = new char[len];
+    sprintf(path, "../data/%s/%s/%s.%s", group, name, type);
+
+    return path;
+}
+
+struct Resource
+{
+    char* group;
+    char* name;
+    char* type;
+    char* location;
+    Resource(const char* _group, const char* _name, const char* _type)
+    {
+        group = string_new(_group);
+        name = string_new(_name);
+        type = string_new(_type);
+        location = find_resource_location(group, name, type);
+    }
+    ~Resource()
+    {
+        delete[] group;
+        delete[] name;
+        delete[] type;
+        delete[] location;
+    }
+};
+
+class ResourceManager
+{
+    std::vector<Resource*> resources;
+public:
+    ~ResourceManager()
+    {
+        for(auto it = resources.begin(); it != resources.end(); it++)
+        {
+            delete (*it);
+        }
+    }
+    // Return the default resource for the given type, make it obvious.
+    Resource* getDefaultResource(const char* type)
+    {
+        //TODO: Implement.
+        return NULL;
+    }
+
+    // Locates the resource given a group, name, and type. Resources are case sensitive.
+    Resource* findResource(const char* group, const char* name, const char* type)
+    {
+        // We *need* a much faster way to find resources.
+        for(auto it = resources.begin(); it != resources.end(); it++)
+        {
+            if(strcmp(name, (*it)->name) == 0 &&
+               strcmp(group, (*it)->group) == 0 &&
+               strcmp(type, (*it)->type) == 0)
+            {
+                return *it;
+            }
+#if VERIFY
+            // We should consider returning the found resource in shipping builds.
+            else if(stricmp(name, (*it)->name) == 0 &&
+                    stricmp(group, (*it)->group) == 0 &&
+                    stricmp(type, (*it)->type) == 0)
+            {
+                UDebugF("Resource (%s:%s:%s) found already loaded with mismatching case (%s:%s:%s)",
+                        group, name, type,
+                        (*it).group, (*it).name, (*it).type);
+
+                return getDefaultResource(type);
+            }
+#endif
+        }
+
+
+        Resource* res = new Resource(group, name, type);
+
+        resources.push_back(res);
+    }
+};
+
+const char* get_resource_path(ResourceManager* mgr, const char* group, const char* name, const char* type)
+{
+    Resource* res = mgr->findResource(group, name, type);
+    puts(res->location);
+    return res->location;
+}
 
 int main()
 {
@@ -6,41 +113,51 @@ int main()
         irr::createDevice(irr::video::EDT_SOFTWARE, irr::core::dimension2d<irr::u32>(1280, 720), 32,
                           false, false, false, 0);
 
-	if (!device)
-		return 1;
+    if (!device)
+        return 1;
 
-	device->setWindowCaption(L"UrEd");
+    ResourceManager* resource_manager = new ResourceManager();
+
+    device->setWindowCaption(L"UrEd");
 
     irr::video::IVideoDriver* driver = device->getVideoDriver();
     irr::scene::ISceneManager* smgr = device->getSceneManager();
 
-	/*IAnimatedMesh* mesh = smgr->getMesh("../../media/sydney.md2");
-	if (!mesh)
-	{
-		device->drop();
-		return 1;
-	}
-	IAnimatedMeshSceneNode* node = smgr->addAnimatedMeshSceneNode( mesh );
+    lua_State* lua = luaL_newstate();
 
-	if (node)
-	{
-		node->setMaterialFlag(EMF_LIGHTING, false);
-		node->setMD2Animation(scene::EMAT_STAND);
-		node->setMaterialTexture( 0, driver->getTexture("../../media/sydney.bmp") );
-	}*/
+    luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua"));
 
-	smgr->addCameraSceneNode(0, irr::core::vector3df(0,30,-40), irr::core::vector3df(0,5,0));
+    /*IAnimatedMesh* mesh = smgr->getMesh("../../media/sydney.md2");
+    if (!mesh)
+    {
+        device->drop();
+        return 1;
+    }
+    IAnimatedMeshSceneNode* node = smgr->addAnimatedMeshSceneNode( mesh );
 
-	while(device->run())
-	{
-		driver->beginScene(true, true, irr::video::SColor(255,100,101,140));
+    if (node)
+    {
+        node->setMaterialFlag(EMF_LIGHTING, false);
+        node->setMD2Animation(scene::EMAT_STAND);
+        node->setMaterialTexture( 0, d  river->getTexture("../../media/sydney.bmp") );
+    }*/
 
-		smgr->drawAll();
+    smgr->addCameraSceneNode(0, irr::core::vector3df(0,30,-40), irr::core::vector3df(0,5,0));
 
-		driver->endScene();
-	}
+    while(device->run())
+    {
+        driver->beginScene(true, true, irr::video::SColor(255,100,101,140));
 
-	device->drop();
+        smgr->drawAll();
 
-	return 0;
+        driver->endScene();
+    }
+
+    lua_close(lua);
+
+    delete resource_manager;
+
+    device->drop();
+
+    return 0;
 }
