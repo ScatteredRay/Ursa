@@ -1,6 +1,10 @@
 #include <irrlicht.h>
+
+extern "C"
+{
 #include <lua.h>
 #include <lauxlib.h>
+}
 
 #include <vector>
 
@@ -21,15 +25,16 @@ char* string_new(const char* str)
 {
     char* newstr = new char[strlen(str) + 1];
     strcpy(newstr, str);
+    return newstr;
 }
 
 char* find_resource_location(const char* group, const char* name, const char* type)
 {
     const char* project = "editor";
     //TODO: Build this helper func!
-    size_t len = strlen(project) + strlen(group) + strlen(name) + strlen(type) + 11 + 1;
+    size_t len = snprintf(0, 0, "../data/%s/%s/%s.%s", project, group, name, type) + 1;
     char* path = new char[len];
-    sprintf(path, "../data/%s/%s/%s.%s", group, name, type);
+    snprintf(path, len, "../data/%s/%s/%s.%s", project, group, name, type);
 
     return path;
 }
@@ -62,7 +67,7 @@ class ResourceManager
 public:
     ~ResourceManager()
     {
-        for(auto it = resources.begin(); it != resources.end(); it++)
+        for(std::vector<Resource*>::iterator it = resources.begin(); it != resources.end(); it++)
         {
             delete (*it);
         }
@@ -78,7 +83,7 @@ public:
     Resource* findResource(const char* group, const char* name, const char* type)
     {
         // We *need* a much faster way to find resources.
-        for(auto it = resources.begin(); it != resources.end(); it++)
+        for(std::vector<Resource*>::iterator it = resources.begin(); it != resources.end(); it++)
         {
             if(strcmp(name, (*it)->name) == 0 &&
                strcmp(group, (*it)->group) == 0 &&
@@ -103,15 +108,14 @@ public:
 
 
         Resource* res = new Resource(group, name, type);
-
         resources.push_back(res);
+        return res;
     }
 };
 
 const char* get_resource_path(ResourceManager* mgr, const char* group, const char* name, const char* type)
 {
     Resource* res = mgr->findResource(group, name, type);
-    puts(res->location);
     return res->location;
 }
 
