@@ -4,6 +4,9 @@ extern "C"
 {
 #include <lua.h>
 #include <lauxlib.h>
+#include <lualib.h>
+
+#include <luasocket.h>
 }
 
 #include <vector>
@@ -30,11 +33,12 @@ char* string_new(const char* str)
 
 char* find_resource_location(const char* group, const char* name, const char* type)
 {
+    const char* data_root = "../data";
     const char* project = "editor";
     //TODO: Build this helper func!
-    size_t len = snprintf(0, 0, "../data/%s/%s/%s.%s", project, group, name, type) + 1;
+    size_t len = snprintf(0, 0, "%s/%s/%s/%s.%s", data_root, project, group, name, type) + 1;
     char* path = new char[len];
-    snprintf(path, len, "../data/%s/%s/%s.%s", project, group, name, type);
+    snprintf(path, len, "%s/%s/%s/%s.%s", data_root, project, group, name, type);
 
     return path;
 }
@@ -119,6 +123,15 @@ const char* get_resource_path(ResourceManager* mgr, const char* group, const cha
     return res->location;
 }
 
+void setLuaPath(lua_State* L, const char* path)
+{
+    lua_getglobal(L, "package");
+    lua_pushstring(L, path);
+    lua_setfield(L, -2, "path");
+    lua_pop(L, 1);
+}
+
+
 int main()
 {
     irr::IrrlichtDevice *device =
@@ -136,8 +149,14 @@ int main()
     irr::scene::ISceneManager* smgr = device->getSceneManager();
 
     lua_State* lua = luaL_newstate();
+    luaL_openlibs(lua);
+    setLuaPath(lua, "../data/script/editor/lib/luasocket/");
+    luaopen_socket_core(lua);
 
-    luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua"));
+    if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
+    {
+        printf("Lua Error: %s", lua_tostring(lua, -1));
+    }
 
     /*IAnimatedMesh* mesh = smgr->getMesh("../../media/sydney.md2");
     if (!mesh)

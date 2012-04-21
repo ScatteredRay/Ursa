@@ -13,4 +13,5 @@ end
 
 require "irrlicht"
 require "lua"
+require "luasocket"
 require "editor"
