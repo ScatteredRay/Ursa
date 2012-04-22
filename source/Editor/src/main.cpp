@@ -10,6 +10,7 @@ extern "C"
 }
 
 #include <vector>
+#include <alloca.h>
 
 #ifdef __APPLE__
 #include "strings.h"
@@ -31,16 +32,64 @@ char* string_new(const char* str)
     return newstr;
 }
 
+const char* find_data_root()
+{
+    return "../data";
+}
+
+const char* projects[] = {"editor", NULL};
+
+const char* search_paths[] = {"",
+                              "lib/",
+                              "lib/coxpcall/",
+                              "lib/copas/",
+                              "lib/xavante/",
+                              NULL};
+
+#define PATH_SEPERATOR '/'
+
 char* find_resource_location(const char* group, const char* name, const char* type)
 {
-    const char* data_root = "../data";
-    const char* project = "editor";
-    //TODO: Build this helper func!
-    size_t len = snprintf(0, 0, "%s/%s/%s/%s.%s", data_root, project, group, name, type) + 1;
-    char* path = new char[len];
-    snprintf(path, len, "%s/%s/%s/%s.%s", data_root, project, group, name, type);
+    const char* data_root = find_data_root();
 
-    return path;
+    char* nname = (char*)alloca(strlen(name) + 1);
+    strcpy(nname, name);
+
+    if(stricmp(type, "lua") == 0)
+    {
+        for(char* c = nname; *c != '\0'; c++)
+        {
+            if(*c == '.')
+            {
+                *c = PATH_SEPERATOR;
+            }
+        }
+    }
+
+    for(const char** project = projects; *project != NULL; project++)
+    {
+        for(const char** search = search_paths; *search != NULL; search++)
+        {
+            //TODO: Build this helper func!
+            size_t len = snprintf(0, 0, "%s/%s/%s/%s%s.%s", data_root, *project, group, *search, nname, type) + 1;
+            char* path = new char[len];
+            snprintf(path, len, "%s/%s/%s/%s%s.%s", data_root, *project, group, *search, nname, type);
+
+            // Perhaps we should Stat here instead?
+            FILE* f = fopen(path, "rb");
+            if(f)
+            {
+                fclose(f);
+                return path;
+            }
+            else
+            {
+                delete[] path;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 struct Resource
@@ -123,12 +172,38 @@ const char* get_resource_path(ResourceManager* mgr, const char* group, const cha
     return res->location;
 }
 
-void setLuaPath(lua_State* L, const char* path)
+ResourceManager* resource_manager = NULL;
+
+int lua_find_module(lua_State* lua)
 {
-    lua_getglobal(L, "package");
-    lua_pushstring(L, path);
-    lua_setfield(L, -2, "path");
-    lua_pop(L, 1);
+    const char* package = lua_tostring(lua, -1);
+    const char* lua_file = get_resource_path(resource_manager, "script", package, "lua");
+    lua_pop(lua, 1);
+
+    UDebugF("lua_find_module: %s (%s)\n", package, lua_file);
+
+    if(lua_file)
+    {
+        luaL_loadfile(lua, lua_file);
+    }
+    else
+    {
+        lua_pushstring(lua, "Resource not found\n");
+    }
+
+    return 1;
+}
+
+void lua_setup_loader(lua_State* lua)
+{
+    lua_getglobal(lua, "package");
+    lua_pushstring(lua, "");
+    lua_setfield(lua, -2, "path");
+
+    lua_getfield(lua, -1, "searchers");
+    lua_pushcfunction(lua, lua_find_module);
+    lua_rawseti(lua, -2, 1);
+    lua_pop(lua, 2);
 }
 
 
@@ -141,7 +216,7 @@ int main()
     if (!device)
         return 1;
 
-    ResourceManager* resource_manager = new ResourceManager();
+    resource_manager = new ResourceManager();
 
     device->setWindowCaption(L"UrEd");
 
@@ -150,12 +225,12 @@ int main()
 
     lua_State* lua = luaL_newstate();
     luaL_openlibs(lua);
-    setLuaPath(lua, "../data/script/editor/lib/luasocket/");
+    lua_setup_loader(lua);
     luaopen_socket_core(lua);
 
     if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
     {
-        printf("Lua Error: %s", lua_tostring(lua, -1));
+        UDebugF("Lua Error: %s", lua_tostring(lua, -1));
     }
 
     /*IAnimatedMesh* mesh = smgr->getMesh("../../media/sydney.md2");
@@ -187,6 +262,7 @@ int main()
     lua_close(lua);
 
     delete resource_manager;
+    resource_manager = NULL;
 
     device->drop();
 
