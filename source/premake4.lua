@@ -11,6 +11,8 @@ if(os.get() == "macosx") then
    --linkoptions("-stdlib=libc++")
 end
 
+defines { "LUA_COMPAT_MODULE=1" }
+
 require "irrlicht"
 require "lua"
 require "luasocket"

@@ -10,7 +10,12 @@ extern "C"
 }
 
 #include <vector>
+
+#ifdef _WIN32
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
 
 #ifdef __APPLE__
 #include "strings.h"

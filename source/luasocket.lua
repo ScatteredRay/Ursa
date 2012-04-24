@@ -1,8 +1,11 @@
 project("luasocket")
     kind("StaticLib")
     files { "luasocket/inc/*.h", "luasocket/src/*.c" }
-    -- Only on win32.
-    excludes { "luasocket/src/wsocket.c" }
+    if(os.get() == "windows") then
+       excludes { "luasocket/src/unix.c", "luasocket/src/usocket.c" }
+    else
+       excludes { "luasocket/src/wsocket.c" }
+    end
     includedirs { "luasocket/inc", "lua/inc" }
 
     configuration("Debug")
