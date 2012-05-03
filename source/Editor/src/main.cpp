@@ -262,9 +262,9 @@ int main()
 
     {
         lua_getglobal(lua, MONGOOSE_MODULE_NAME);
-        size_t len = snprintf(0, 0, "%s/%s/%s", find_data_root(), "editor", "www") + 1;
+        size_t len = snprintf(0, 0, "%s/%s/%s", find_data_root(), "editor", "interface") + 1;
         char* document_root = new char[len];
-        snprintf(document_root, len, "%s/%s/%s", find_data_root(), "editor", "www");
+        snprintf(document_root, len, "%s/%s/%s", find_data_root(), "editor", "interface");
         lua_pushstring(lua, document_root);
         lua_setfield(lua, -2, "document_root");
         delete[] document_root;
