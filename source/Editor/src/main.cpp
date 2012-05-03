@@ -211,6 +211,33 @@ void lua_setup_loader(lua_State* lua)
     lua_pop(lua, 2);
 }
 
+int lua_open_game(lua_State* lua)
+{
+    static const luaL_Reg gamelib[] = {
+        {NULL, NULL}
+    };
+    luaL_register(lua, "game", gamelib);
+
+    // I'd like to push the callbacks here, but if I push nils I'm in the same place I started.
+
+    return 1;
+}
+
+void game_update(lua_State* lua)
+{
+    lua_getglobal(lua, "game");
+    lua_getfield(lua, -1, "onupdate");
+    if(lua_isfunction(lua, -1))
+    {
+        lua_call(lua, 0, 0);
+    }
+    else
+    {
+        lua_pop(lua, 1);
+    }
+    lua_pop(lua, 1);
+}
+
 
 int main()
 {
@@ -232,6 +259,8 @@ int main()
     luaL_openlibs(lua);
     lua_setup_loader(lua);
     lua_open_mongoose(lua);
+
+    lua_open_game(lua);
 
     if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
     {
@@ -257,10 +286,10 @@ int main()
 
     while(device->run())
     {
+        game_update(lua);
+
         driver->beginScene(true, true, irr::video::SColor(255,100,101,140));
-
         smgr->drawAll();
-
         driver->endScene();
     }
 

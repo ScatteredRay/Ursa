@@ -1,3 +1,5 @@
 server = httpd.start()
 
-httpd.update(server)
+game.onupdate = function()
+   httpd.update(server)
+end
