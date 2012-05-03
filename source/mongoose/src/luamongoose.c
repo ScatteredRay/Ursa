@@ -56,14 +56,25 @@ int mongoose_start(lua_State* L)
     simple_mutex_init(&luadata->mutex);
     simple_mutex_lock(&luadata->mutex);
 
+    const char* document_root = ".";
+
+    lua_getglobal(L, MONGOOSE_MODULE_NAME);
+    lua_getfield(L, -1, "document_root");
+    if(lua_isstring(L, -1))
+    {
+        document_root = lua_tostring(L, -1);
+    }
+
     const char* options[] = {
         "listening_ports", "8080",
+        "enable_directory_listing", "no",
+        "document_root", document_root,
         NULL
     };
 
     luadata->mgctx = mg_start(&mongoose_callback, luadata, options);
 
-    //TODO: return luadata
+    lua_pop(L, 2);
     lua_pushlightuserdata(L, luadata);
 
     return 1;
@@ -101,6 +112,6 @@ static const luaL_Reg mongooselib[] = {
 
 int lua_open_mongoose(lua_State* L)
 {
-    luaL_register(L, "httpd", mongooselib);
+    luaL_register(L, MONGOOSE_MODULE_NAME, mongooselib);
     return 1;
 }

@@ -260,6 +260,17 @@ int main()
     lua_setup_loader(lua);
     lua_open_mongoose(lua);
 
+    {
+        lua_getglobal(lua, MONGOOSE_MODULE_NAME);
+        size_t len = snprintf(0, 0, "%s/%s/%s", find_data_root(), "editor", "www") + 1;
+        char* document_root = new char[len];
+        snprintf(document_root, len, "%s/%s/%s", find_data_root(), "editor", "www");
+        lua_pushstring(lua, document_root);
+        lua_setfield(lua, -2, "document_root");
+        delete[] document_root;
+        lua_pop(lua, 1);
+    }
+
     lua_open_game(lua);
 
     if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
