@@ -15,4 +15,5 @@ defines { "LUA_COMPAT_MODULE=1" }
 
 require "irrlicht"
 require "lua"
+require "mongoose"
 require "editor"

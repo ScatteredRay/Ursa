@@ -5,6 +5,8 @@ extern "C"
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+
+#include <luamongoose.h>
 }
 
 #include <vector>
@@ -229,6 +231,7 @@ int main()
     lua_State* lua = luaL_newstate();
     luaL_openlibs(lua);
     lua_setup_loader(lua);
+    lua_open_mongoose(lua);
 
     if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
     {
