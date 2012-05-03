@@ -5,8 +5,6 @@ extern "C"
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
-
-#include <luasocket.h>
 }
 
 #include <vector>
@@ -231,7 +229,6 @@ int main()
     lua_State* lua = luaL_newstate();
     luaL_openlibs(lua);
     lua_setup_loader(lua);
-    luaopen_socket_core(lua);
 
     if(luaL_dofile(lua, get_resource_path(resource_manager, "script", "editor", "lua")))
     {

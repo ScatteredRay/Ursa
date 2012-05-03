@@ -15,5 +15,4 @@ defines { "LUA_COMPAT_MODULE=1" }
 
 require "irrlicht"
 require "lua"
-require "luasocket"
 require "editor"
