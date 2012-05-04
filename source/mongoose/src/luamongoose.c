@@ -1,6 +1,7 @@
 #include "luamongoose.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <lua.h>
 #include <lauxlib.h>
 
@@ -38,6 +39,11 @@ struct lua_mg_data
     int server_lua_ref;
 };
 
+// Stolen from mongoose.c:
+static void gmt_time_string(char *buf, size_t buf_len, time_t *t) {
+  strftime(buf, buf_len, "%a, %d %b %Y %H:%M:%S GMT", gmtime(t));
+}
+
 void* mongoose_callback(enum mg_event event,
                         struct mg_connection* conn,
                         const struct mg_request_info* request_info)
@@ -57,13 +63,41 @@ void* mongoose_callback(enum mg_event event,
     lua_getfield(luadata->lua, -1, "onrequest");
     if(lua_isfunction(luadata->lua, -1))
     {
-        lua_call(luadata->lua, 0, 0);
+        lua_pushstring(luadata->lua, request_info->request_method);
+        lua_pushstring(luadata->lua, request_info->uri);
+        lua_call(luadata->lua, 2, 1);
+        printf("return\n");
+        if(lua_isstring(luadata->lua, -1))
+        {
+            printf("string\n");
+            const char* response = lua_tostring(luadata->lua, -1);
+            int response_length = strlen(response);
+            printf("response: %s", response);
+
+            time_t curtime = time(NULL);
+            char date[64];
+            gmt_time_string(date, sizeof(date), &curtime);
+            (void) mg_printf(conn,
+                             "HTTP/1.1 %d %s\r\n"
+                             "Date: %s\r\n"
+                             //Cache-Control
+                             "Content-Type: %s\r\n"
+                             "Content-Length: %d\r\n"
+                             "Connection: close\r\n\r\n",
+                             200, "OK", date, "application/json", response_length);
+
+            (void) mg_write(conn, response, response_length);
+            retval = 1;
+        }
+
+        lua_pop(luadata->lua, 1); // function return value
+
     }
     else
     {
-        lua_pop(luadata->lua, 1);
+        lua_pop(luadata->lua, 1); // "onrequest" value
     }
-    lua_pop(luadata->lua, 1);
+    lua_pop(luadata->lua, 1); // table
     //TODO: Implement me! return non-nil
     simple_mutex_unlock(&luadata->mutex);
     return retval;
