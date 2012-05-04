@@ -2,7 +2,7 @@ project("editor")
     kind("WindowedApp")
     files { "Editor/src/**.h", "Editor/src/**.cpp" }
     includedirs { "Irrlicht/inc", "lua/inc", "mongoose/inc" }
-    links { "irrlicht", "lua", "mongoose" }
+    links { "irrlicht", "lua", "luacjson", "mongoose" }
 
     if(os.get() == "macosx") then
        links { "OpenGL.framework", "Cocoa.framework", "IOKit.framework" }

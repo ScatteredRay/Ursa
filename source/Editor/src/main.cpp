@@ -7,6 +7,8 @@ extern "C"
 #include <lualib.h>
 
 #include <luamongoose.h>
+
+int luaopen_cjson(lua_State *l);
 }
 
 #include <vector>
@@ -256,6 +258,8 @@ int main()
     luaL_openlibs(lua);
     lua_setup_loader(lua);
     lua_open_mongoose(lua);
+
+    luaopen_cjson(lua);
 
     {
         lua_getglobal(lua, MONGOOSE_MODULE_NAME);

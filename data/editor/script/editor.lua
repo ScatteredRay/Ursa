@@ -2,7 +2,7 @@ server = httpd.start()
 
 server.onrequest = function(method, uri)
    if(uri == "/test") then
-      return "{\"uri\" : \"" .. uri .. "\"}"
+      return cjson.encode({uri = uri})
    else
       return nil
    end
