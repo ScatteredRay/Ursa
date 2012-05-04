@@ -35,6 +35,7 @@ struct lua_mg_data
     lua_State* lua;
     simple_mutex mutex;
     struct mg_context* mgctx;
+    int server_lua_ref;
 };
 
 void* mongoose_callback(enum mg_event event,
@@ -43,10 +44,29 @@ void* mongoose_callback(enum mg_event event,
 {
     struct lua_mg_data* luadata = (struct lua_mg_data*)request_info->user_data;
 
+    if(event != MG_NEW_REQUEST)
+    {
+        return NULL;
+    }
+
+    void* retval = NULL;
+
     simple_mutex_lock(&luadata->mutex);
+
+    lua_rawgeti(luadata->lua, LUA_REGISTRYINDEX, luadata->server_lua_ref);
+    lua_getfield(luadata->lua, -1, "onrequest");
+    if(lua_isfunction(luadata->lua, -1))
+    {
+        lua_call(luadata->lua, 0, 0);
+    }
+    else
+    {
+        lua_pop(luadata->lua, 1);
+    }
+    lua_pop(luadata->lua, 1);
     //TODO: Implement me! return non-nil
     simple_mutex_unlock(&luadata->mutex);
-    return NULL;
+    return retval;
 }
 
 int mongoose_start(lua_State* L)
@@ -75,27 +95,37 @@ int mongoose_start(lua_State* L)
     luadata->mgctx = mg_start(&mongoose_callback, luadata, options);
 
     lua_pop(L, 2);
+
+    lua_newtable(L);
     lua_pushlightuserdata(L, luadata);
+    lua_setfield(L, -2, MONGOOSE_TABLE_FIELD);
+
+    lua_pushvalue(L, -1);
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    luadata->server_lua_ref = ref;
 
     return 1;
 }
 
 int mongoose_end(lua_State* L)
 {
+    lua_getfield(L, -1, MONGOOSE_TABLE_FIELD);
     struct lua_mg_data* luadata = lua_touserdata(L, -1);
-    lua_pop(L, 1);
+    lua_pop(L, 2);
 
     simple_mutex_unlock(&luadata->mutex);
     mg_stop(luadata->mgctx);
     simple_mutex_destroy(&luadata->mutex);
+    luaL_unref(L, LUA_REGISTRYINDEX, luadata->server_lua_ref);
     free(luadata);
     return 0;
 }
 
 int mongoose_update(lua_State* L)
 {
+    lua_getfield(L, -1, MONGOOSE_TABLE_FIELD);
     struct lua_mg_data* luadata = lua_touserdata(L, -1);
-    lua_pop(L, 1);
+    lua_pop(L, 2);
 
     simple_mutex_unlock(&luadata->mutex);
     // If the mutex scheduling is decent, it'll should switch here, otherwise put in a wait;

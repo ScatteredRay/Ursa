@@ -4,6 +4,7 @@
 #include <lua.h>
 
 #define MONGOOSE_MODULE_NAME "httpd"
+#define MONGOOSE_TABLE_FIELD "mongooseptr"
 
 int lua_open_mongoose(lua_State* L);
 
