@@ -46,9 +46,6 @@ const char* projects[] = {"editor", NULL};
 
 const char* search_paths[] = {"",
                               "lib/",
-                              "lib/coxpcall/",
-                              "lib/copas/",
-                              "lib/xavante/",
                               NULL};
 
 #define PATH_SEPERATOR '/'
