@@ -1,6 +1,6 @@
 server = httpd.start()
 
-server.onrequest = function(method, uri)
+server.onrequest = function(method, uri, content)
    if(uri == "/test") then
       return cjson.encode({uri = uri})
    else

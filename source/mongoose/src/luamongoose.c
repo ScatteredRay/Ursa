@@ -55,6 +55,24 @@ void* mongoose_callback(enum mg_event event,
         return NULL;
     }
 
+    char* read_buffer = NULL;
+    int start_offset = 0;
+    int buffer_len = 1024;
+
+    do
+    {
+        read_buffer = realloc(read_buffer, buffer_len);
+        char* read_start = read_buffer + start_offset;
+        int read_len = mg_read(conn, read_start, buffer_len-start_offset);
+        if(read_len < buffer_len-start_offset)
+        {
+            read_start[read_len] = '\0';
+            break;
+        }
+        start_offset += read_len;
+        buffer_len *= 2;
+    } while(1);
+
     void* retval = NULL;
 
     simple_mutex_lock(&luadata->mutex);
@@ -65,8 +83,8 @@ void* mongoose_callback(enum mg_event event,
     {
         lua_pushstring(luadata->lua, request_info->request_method);
         lua_pushstring(luadata->lua, request_info->uri);
-        lua_call(luadata->lua, 2, 1);
-        printf("return\n");
+        lua_pushstring(luadata->lua, read_buffer);
+        lua_call(luadata->lua, 3, 1);
         if(lua_isstring(luadata->lua, -1))
         {
             printf("string\n");
@@ -100,6 +118,7 @@ void* mongoose_callback(enum mg_event event,
     lua_pop(luadata->lua, 1); // table
     //TODO: Implement me! return non-nil
     simple_mutex_unlock(&luadata->mutex);
+    free(read_buffer);
     return retval;
 }
 
